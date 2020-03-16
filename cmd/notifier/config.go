@@ -7,7 +7,8 @@ import (
 )
 
 type config struct {
-	Mail struct {
+	ServerAddress string `conf:"help:Server-address network-interface to bind on e.g.: '127.0.0.1:8080',default:0.0.0.0:80"`
+	Mail          struct {
 		TemplatesFolderPath string `conf:"help:Path to mail-templates folder,default:/mail-templates"`
 		SMTPUsername        string `conf:"env:MAIL_SMTP_USERNAME,help:SMTP username to authorize with,required"`
 		SMTPPassword        string `conf:"env:MAIL_SMTP_PASSWORD,help:SMTP password to authorize with,required,noprint"`

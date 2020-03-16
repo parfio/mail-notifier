@@ -4,8 +4,11 @@ import (
 	"fmt"
 	"github.com/ardanlabs/conf"
 	"github.com/parfio/mail-notifier/internal/mailer"
+	"github.com/parfio/mail-notifier/internal/web"
 	"github.com/sirupsen/logrus"
-	"log"
+	"os"
+	"os/signal"
+	"syscall"
 )
 
 func main() {
@@ -21,7 +24,7 @@ func main() {
 	fmt.Print(cfgAsString)
 	logrus.Infof("Starting notifier")
 
-	m, err := mailer.New(cfg.Mail.TemplatesFolderPath,
+	_, err = mailer.New(cfg.Mail.TemplatesFolderPath,
 		cfg.Mail.SMTPUsername,
 		cfg.Mail.SMTPPassword,
 		cfg.Mail.SMTPHost,
@@ -33,8 +36,19 @@ func main() {
 		logrus.WithError(err).Fatal("Failed to create mailer")
 	}
 
-	err = m.SendPackageArrivedEMail("max.marche@live.de", "Max MMARRCHHCE")
-	if err != nil {
-		log.Fatal(err)
+	errs := make(chan error)
+	go func() {
+		errs <- web.StartAliveEndpoint(cfg.ServerAddress)
+	}()
+
+	signals := make(chan os.Signal, 1)
+	signal.Notify(signals, os.Interrupt, syscall.SIGTERM)
+
+	select {
+	case sig := <-signals:
+		logrus.WithField("signal", sig).Info("Notifier interrupted")
+		break
+	case err := <-errs:
+		logrus.WithError(err).Error("Notifier could not continue processing")
 	}
 }
