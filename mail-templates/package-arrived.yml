@@ -1,0 +1,10 @@
+From:
+  - "max.marche@live.de"
+To:
+  - "{{.EMail}}"
+Subject:
+  - "[parfio] a package has arrived for you"
+#Bcc:
+#  - "ddsaf"
+#Reply-To:
+#  - "dsd"

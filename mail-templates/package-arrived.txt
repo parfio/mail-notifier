@@ -1,0 +1,4 @@
+Dear {{.Name}},
+a package has arrived for you.
+
+Greetings, parfio-app
