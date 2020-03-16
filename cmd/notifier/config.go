@@ -7,8 +7,9 @@ import (
 )
 
 type config struct {
-	ServerAddress string `conf:"help:Server-address network-interface to bind on e.g.: '127.0.0.1:8080',default:0.0.0.0:80"`
-	Mail          struct {
+	ServerAddress       string `conf:"help:Server-address network-interface to bind on e.g.: '127.0.0.1:8080',default:0.0.0.0:80"`
+	UsersServiceBaseURL string `conf:"help:Base URL to users service,required"`
+	Mail                struct {
 		TemplatesFolderPath string `conf:"help:Path to mail-templates folder,default:/mail-templates"`
 		SMTPUsername        string `conf:"env:MAIL_SMTP_USERNAME,help:SMTP username to authorize with,required"`
 		SMTPPassword        string `conf:"env:MAIL_SMTP_PASSWORD,help:SMTP password to authorize with,required,noprint"`
@@ -23,7 +24,7 @@ type config struct {
 		BrokerAddress string `conf:"help:MQTT Broker address,required"`
 		ClientID      string `conf:"help:MQTT ClientID,required"`
 		Username      string `conf:"help:MQTT Username to authorize"`
-		Passowrd      string `conf:"help:MQTT Password to authorize"`
+		Passowrd      string `conf:"help:MQTT Password to authorize,noprint"`
 	}
 }
 

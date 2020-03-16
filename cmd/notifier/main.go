@@ -5,6 +5,7 @@ import (
 	"github.com/ardanlabs/conf"
 	"github.com/parfio/mail-notifier/internal/mailer"
 	"github.com/parfio/mail-notifier/internal/mqtt"
+	"github.com/parfio/mail-notifier/internal/users"
 	"github.com/parfio/mail-notifier/internal/web"
 	"github.com/sirupsen/logrus"
 	"os"
@@ -37,10 +38,12 @@ func main() {
 		logrus.WithError(err).Fatal("Failed to create mailer")
 	}
 
-	_, err, mqttERRS := mqtt.NewClient(cfg.MQTT.BrokerAddress, cfg.MQTT.ClientID, cfg.MQTT.Username, cfg.MQTT.Passowrd)
+	_, err, mqttErrs := mqtt.NewClient(cfg.MQTT.BrokerAddress, cfg.MQTT.ClientID, cfg.MQTT.Username, cfg.MQTT.Passowrd)
 	if err != nil {
 		logrus.WithError(err).Fatal("Failed to create mqtt-client")
 	}
+
+	users.NewClient(cfg.UsersServiceBaseURL)
 
 	errs := make(chan error)
 	go func() {
@@ -56,7 +59,7 @@ func main() {
 		break
 	case err := <-errs:
 		logrus.WithError(err).Error("Notifier could not continue processing")
-	case err := <-mqttERRS:
+	case err := <-mqttErrs:
 		logrus.WithError(err).Error("MQTT-client could not continue processing")
 	}
 

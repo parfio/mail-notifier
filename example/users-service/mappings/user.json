@@ -1,0 +1,22 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/v1/users/4711",
+    "queryParameters": {
+      "clientID": {
+        "matches": "cLiEnT"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "jsonBody": {
+      "id": "fl1",
+      "names": [
+        "FirstName1",
+        "LastName1"
+      ],
+      "email": "test.test@test.test"
+    }
+  }
+}

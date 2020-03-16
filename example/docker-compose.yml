@@ -14,6 +14,7 @@ services:
       MMN_MAIL_TLS_SERVER_NAME: "smtp"
       MMN_MQTT_BROKER_ADDRESS: "mqtt:1883"
       MMN_MQTT_CLIENT_ID: "mqtt-mail-notifier"
+      MMN_USERS_SERVICE_BASE_URL: "http://users-service:8080"
     depends_on:
       - users-service
       - mqtt
