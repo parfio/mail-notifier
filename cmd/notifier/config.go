@@ -19,13 +19,19 @@ type config struct {
 			ServerName         string `conf:"help:name of the server who expose the certificate"`
 		}
 	}
+	MQTT struct {
+		BrokerAddress string `conf:"help:MQTT Broker address,required"`
+		ClientID      string `conf:"help:MQTT ClientID,required"`
+		Username      string `conf:"help:MQTT Username to authorize"`
+		Passowrd      string `conf:"help:MQTT Password to authorize"`
+	}
 }
 
 func newConfig() (config, error) {
 	cfg := config{}
 
-	if origErr := conf.Parse(os.Environ(), "SJP", &cfg); origErr != nil {
-		usage, err := conf.Usage("SJP", &cfg)
+	if origErr := conf.Parse(os.Environ(), "MMN", &cfg); origErr != nil {
+		usage, err := conf.Usage("MMN", &cfg)
 		if err != nil {
 			return cfg, err
 		}
