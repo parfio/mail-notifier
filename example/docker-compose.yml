@@ -1,0 +1,37 @@
+version: '3.5'
+
+services:
+  mqtt-mail-notifier:
+    restart: on-failure:10
+    build:
+      context: ../
+    environment:
+      MMN_MAIL_SMTP_HOST: "smtp"
+      MMN_MAIL_SMTP_PORT: 1025
+      MMN_MAIL_SMTP_PASSWORD: ""
+      MMN_MAIL_SMTP_USERNAME: ""
+      MMN_MAIL_TLS_INSECURE_SKIP_VERIFY: "true"
+      MMN_MAIL_TLS_SERVER_NAME: "smtp"
+      MMN_MQTT_BROKER_ADDRESS: "mqtt:1883"
+      MMN_MQTT_CLIENT_ID: "mqtt-mail-notifier"
+    depends_on:
+      - users-service
+      - mqtt
+      - smtp
+
+  users-service:
+    build:
+      context: ./users-service
+
+  mqtt:
+    image: emqx/emqx
+    environment:
+      EMQX_MQTT__MAX_PACKET_SIZE: 10MB
+    ports:
+      - "18083:18083"
+
+  smtp:
+    image: mailhog/mailhog
+    restart: always
+    ports:
+      - "8025:8025"
