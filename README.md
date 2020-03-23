@@ -1,1 +1,1 @@
-# mail-notifier
+# mqtt-mail-notifier

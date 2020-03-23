@@ -1,4 +1,4 @@
-module github.com/parfy-io/mail-notifier
+module github.com/parfy-io/mqtt-mail-notifier
 
 go 1.13
 
