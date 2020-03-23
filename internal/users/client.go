@@ -23,7 +23,7 @@ func NewClient(userServiceBaseURL string) Client {
 }
 
 func (c Client) ByUserID(clientID, userID string) (User, error) {
-	resp, err := http.Get(fmt.Sprintf("%sv1/users/%s?clientID=%s", c.usersServiceBaseURL, userID, clientID))
+	resp, err := http.Get(fmt.Sprintf("%sv1/clients/%s/users/%s", c.usersServiceBaseURL, clientID, userID))
 	if err != nil {
 		return User{}, fmt.Errorf("failed to request users-service: %w", err)
 	}
@@ -47,5 +47,6 @@ func (c Client) ByUserID(clientID, userID string) (User, error) {
 }
 
 type User struct {
-	EMail string `json:"email"`
+	EMail    string `json:"email"`
+	FullName string `json:"full_name"`
 }

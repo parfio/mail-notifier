@@ -30,6 +30,7 @@ services:
       EMQX_MQTT__MAX_PACKET_SIZE: 10MB
     ports:
       - "18083:18083"
+      - "8083:8083"
 
   smtp:
     image: mailhog/mailhog

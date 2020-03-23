@@ -1,9 +1,11 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"github.com/ardanlabs/conf"
-	"github.com/parfio/mail-notifier/internal/mailer"
+	"github.com/parfio/mail-notifier/internal"
+	"github.com/parfio/mail-notifier/internal/mail"
 	"github.com/parfio/mail-notifier/internal/mqtt"
 	"github.com/parfio/mail-notifier/internal/users"
 	"github.com/parfio/mail-notifier/internal/web"
@@ -26,7 +28,7 @@ func main() {
 	fmt.Print(cfgAsString)
 	logrus.Infof("Starting notifier")
 
-	_, err = mailer.New(cfg.Mail.TemplatesFolderPath,
+	mailer, err := mail.New(cfg.Mail.TemplatesFolderPath,
 		cfg.Mail.SMTPUsername,
 		cfg.Mail.SMTPPassword,
 		cfg.Mail.SMTPHost,
@@ -35,32 +37,55 @@ func main() {
 		cfg.Mail.TLS.ServerName,
 	)
 	if err != nil {
-		logrus.WithError(err).Fatal("Failed to create mailer")
+		logrus.WithError(err).Fatal("Failed to create mail")
 	}
 
-	_, err, mqttErrs := mqtt.NewClient(cfg.MQTT.BrokerAddress, cfg.MQTT.ClientID, cfg.MQTT.Username, cfg.MQTT.Passowrd)
+	mqttClient, err, mqttErrs := mqtt.NewClient(cfg.MQTT.BrokerAddress, cfg.MQTT.ClientID, cfg.MQTT.Username, cfg.MQTT.Passowrd)
 	if err != nil {
 		logrus.WithError(err).Fatal("Failed to create mqtt-client")
 	}
 
-	users.NewClient(cfg.UsersServiceBaseURL)
+	usersClient := users.NewClient(cfg.UsersServiceBaseURL)
 
-	errs := make(chan error)
+	webErrs := make(chan error)
 	go func() {
-		errs <- web.StartAliveEndpoint(cfg.ServerAddress)
+		webErrs <- web.StartAliveEndpoint(cfg.ServerAddress)
 	}()
+
+	ctx, cancel := context.WithCancel(context.Background())
+
+	errs := internal.Notifier{
+		Mailer:      mailer,
+		MQTTClient:  mqttClient,
+		UsersClient: usersClient,
+	}.Run(ctx)
 
 	signals := make(chan os.Signal, 1)
 	signal.Notify(signals, os.Interrupt, syscall.SIGTERM)
 
+	hasErr := false
 	select {
 	case sig := <-signals:
 		logrus.WithField("signal", sig).Info("Notifier interrupted")
-		break
-	case err := <-errs:
-		logrus.WithError(err).Error("Notifier could not continue processing")
+	case err := <-webErrs:
+		hasErr = true
+		logrus.WithError(err).Error("Web-Server could not continue processing")
 	case err := <-mqttErrs:
+		hasErr = true
 		logrus.WithError(err).Error("MQTT-client could not continue processing")
+	case err := <-errs:
+		hasErr = true
+		logrus.WithError(err).Error("Notifier could not continue processing")
 	}
 
+	cancel()
+
+	err = mqttClient.Stop()
+	if err != nil {
+		logrus.WithError(err).Error("Could not stop mqtt-client")
+	}
+
+	if hasErr {
+		os.Exit(1)
+	}
 }

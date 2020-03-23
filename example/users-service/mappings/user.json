@@ -1,17 +1,13 @@
 {
   "request": {
     "method": "GET",
-    "urlPath": "/v1/users/4711",
-    "queryParameters": {
-      "clientID": {
-        "matches": "cLiEnT"
-      }
-    }
+    "urlPath": "/v1/clients/4711/users/fl1"
   },
   "response": {
     "status": 200,
     "jsonBody": {
       "id": "fl1",
+      "full_name": "Peter Mansen",
       "names": [
         "FirstName1",
         "LastName1"

@@ -1,4 +1,4 @@
-package mailer
+package mail
 
 import (
 	"crypto/tls"
@@ -35,7 +35,7 @@ func New(templatesFolderPath, username, password, host string, port int, tlsInse
 	}, nil
 }
 
-func (m *Mailer) SendPackageArrivedEMail(recipient, name string) error {
+func (m Mailer) SendPackageArrivedEMail(recipient, name string) error {
 	mailData := struct {
 		EMail string
 		Name  string
