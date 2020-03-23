@@ -3,8 +3,8 @@ package internal
 import (
 	"context"
 	"fmt"
-	"github.com/parfio/mail-notifier/internal/mqtt"
-	"github.com/parfio/mail-notifier/internal/users"
+	"github.com/parfy-io/mail-notifier/internal/mqtt"
+	"github.com/parfy-io/mail-notifier/internal/users"
 	"github.com/sirupsen/logrus"
 )
 

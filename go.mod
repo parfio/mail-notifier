@@ -1,4 +1,4 @@
-module github.com/parfio/mail-notifier
+module github.com/parfy-io/mail-notifier
 
 go 1.13
 
